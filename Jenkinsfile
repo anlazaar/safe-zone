@@ -134,8 +134,9 @@ pipeline {
                             frontend/certs/frontend.key \
                             frontend/certs/frontend.crt \
                             backend/api-gateway/src/main/resources/gateway-keystore.p12
-                            
-                        cp "$TLS_KEY" "$TLS_CRT" frontend/certs/
+                        
+                        mkdir -p certs/ && cp "$TLS_KEY" "$TLS_CRT" frontend/certs/
+
                         cp "$KEYSTORE_FILE" \
                         backend/api-gateway/src/main/resources/gateway-keystore.p12
 
