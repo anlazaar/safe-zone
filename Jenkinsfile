@@ -136,24 +136,25 @@ pipeline {
         stage('Deployment Verification') {
             steps {
                 script {
-                    try {
-                        retry(6) {
+                    retry(6) {
+                        def status = sh(
+                            script: "docker inspect --format='{{.State.Health.Status}}' mr-jenk-pipeline-api-gateway-1",
+                            returnStdout: true
+                        ).trim()
 
-                            def status = sh(
-                                script: "docker inspect --format='{{.State.Health.Status}}' mr-jenk-pipeline-api-gateway-1",
-                                returnStdout: true
-                            ).trim()
-
-                            if (status != 'healthy') {
-                                sleep 5
-                                error("API Gateway is not healthy")
-                            }
+                        if (status != 'healthy') {
+                            sleep 5
+                            error("API Gateway is not healthy")
                         }
+                    }
 
-                        echo "Deployment ${env.IMAGE_TAG} is healthy."
+                    echo "Deployment ${env.IMAGE_TAG} is healthy."
+                }
+            }
 
-                    } catch (Exception e) {
-
+            post {
+                failure {
+                    script {
                         echo "Deployment verification failed."
                         echo "Starting rollback..."
 
@@ -179,7 +180,7 @@ pipeline {
                         echo "Rollback to ${previousVersion} completed."
 
                         error(
-                            "Deployment ${env.IMAGE_TAG} failed. " +
+                            "Deployment failed. " +
                             "Application rolled back to ${previousVersion}."
                         )
                     }
