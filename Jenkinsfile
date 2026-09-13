@@ -56,7 +56,7 @@ pipeline {
         stage('Backend CI') {
             agent {
                 docker {
-                    image 'backend-agent:1.0'
+                    image 'eclipse-temurin:21-jdk'
                 }
             }
 
