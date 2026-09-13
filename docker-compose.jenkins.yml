@@ -1,0 +1,269 @@
+services:
+  kafka:
+    image: apache/kafka:4.1.0
+
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "/opt/kafka/bin/kafka-topics.sh",
+          "--bootstrap-server",
+          "localhost:9092",
+          "--list",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+
+
+  eureka:
+    image: mr-jenk/eureka:${IMAGE_TAG}
+    build: ./backend/eureka
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "-q",
+          "-O",
+          "-",
+          "http://localhost:8761/actuator/health",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+
+  user:
+    image: mr-jenk/user-service:${IMAGE_TAG}
+    build: ./backend/user-service
+
+    depends_on:
+      eureka:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      MONGODB_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGODB_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      ADMIN_NAME: ${ADMIN_NAME}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "-q",
+          "-O",
+          "-",
+          "http://localhost:8081/actuator/health",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+
+  product:
+    image: mr-jenk/product-service:${IMAGE_TAG}
+    build: ./backend/product-service
+
+    depends_on:
+      eureka:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      MONGODB_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGODB_PASSWORD: ${MONGO_ROOT_PASSWORD}
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "-q",
+          "-O",
+          "-",
+          "http://localhost:8082/actuator/health",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+
+  media:
+    image: mr-jenk/media-service:${IMAGE_TAG}
+    build: ./backend/media-service
+
+    depends_on:
+      eureka:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      MONGODB_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGODB_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "-q",
+          "-O",
+          "-",
+          "http://localhost:8083/actuator/health",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+
+  audit:
+    image: mr-jenk/audit-service:${IMAGE_TAG}
+    build: ./backend/audit-service
+
+    depends_on:
+      eureka:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      MONGODB_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGODB_PASSWORD: ${MONGO_ROOT_PASSWORD}
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "-q",
+          "-O",
+          "-",
+          "http://localhost:8084/actuator/health",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+
+  api-gateway:
+    image: mr-jenk/api-gateway:${IMAGE_TAG}
+    build: ./backend/api-gateway
+
+    depends_on:
+      product:
+        condition: service_healthy
+      user:
+        condition: service_healthy
+      media:
+        condition: service_healthy
+      audit:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      JWT_SECRET: ${JWT_SECRET}
+      KEYSTORE_PASSWORD: ${GATEWAY_KEYSTORE_PASSWORD}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:8761/eureka
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "--insecure",
+          "--fail",
+          "https://localhost:8080/actuator/health",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+
+  mongodb:
+    image: mongo:8
+
+    restart: unless-stopped
+
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+
+    volumes:
+      - mongo-data:/data/db
+
+
+  minio:
+    image: minio/minio
+
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+
+    command: server /data
+
+    volumes:
+      - minio-data:/data
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "-f",
+          "http://localhost:9000/minio/health/live",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+
+volumes:
+  mongo-data:
+  kafka-data:
+  minio-data:
