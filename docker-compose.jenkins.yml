@@ -64,7 +64,6 @@ services:
       timeout: 3s
       retries: 20
 
-
   product:
     image: mr-jenk/product-service:${IMAGE_TAG}
     build: ./backend/product-service
@@ -95,7 +94,6 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
-
 
   media:
     image: mr-jenk/media-service:${IMAGE_TAG}
@@ -134,7 +132,6 @@ services:
       timeout: 3s
       retries: 20
 
-
   audit:
     image: mr-jenk/audit-service:${IMAGE_TAG}
     build: ./backend/audit-service
@@ -167,7 +164,6 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
-
 
   api-gateway:
     image: mr-jenk/api-gateway:${IMAGE_TAG}
@@ -259,7 +255,6 @@ services:
     volumes:
       - mongo-data:/data/db
 
-
   minio:
     image: minio/minio
     networks:
@@ -286,14 +281,12 @@ services:
       timeout: 5s
       retries: 20
 
-
 volumes:
   mongo-data:
   kafka-data:
   minio-data:
 
 networks:
-
   frontend-network:
     internal: true
 
