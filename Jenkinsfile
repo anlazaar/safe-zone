@@ -117,13 +117,25 @@ pipeline {
             steps {
                 withCredentials([
                     file(
+                        credentialsId: 'TLS_KEY',
+                        variable: 'TLS_KEY'
+                    ),
+                    file(
+                        credentialsId: 'TLS_CRT',
+                        variable: 'TLS_CRT'
+                    ),
+                    file(
                         credentialsId: 'GATEWAY_KEYSTORE',
                         variable: 'KEYSTORE_FILE'
                     )
                 ]) {
                     sh '''
-                        rm -f backend/api-gateway/src/main/resources/gateway-keystore.p12
-
+                        rm -f \
+                            frontend/certs/frontend.key \
+                            frontend/certs/frontend.crt \
+                            backend/api-gateway/src/main/resources/gateway-keystore.p12
+                            
+                        cp "$TLS_KEY" "$TLS_CRT" frontend/certs/
                         cp "$KEYSTORE_FILE" \
                         backend/api-gateway/src/main/resources/gateway-keystore.p12
 
