@@ -10,19 +10,39 @@ def services = [
 pipeline {
     agent any
 
+    parameters {
+        choice(
+            name: 'TEST_SCOPE',
+            choices: ['all', 'backend', 'frontend', 'none'],
+            description: 'Select which tests to run'
+        )
+
+        booleanParam(
+            name: 'ROLLBACK_ON_FAILURE',
+            defaultValue: true,
+            description: 'Automatically rollback if deployment verification fails'
+        )
+
+        booleanParam(
+            name: 'SEND_NOTIFICATIONS',
+            defaultValue: true,
+            description: 'Send email notifications for build results'
+        )
+    }
+
     environment {
         IMAGE_TAG = "1.0.${BUILD_NUMBER}"
         NOTIFICATION_EMAIL = "amine.yacoubi.med@gmail.com"
 
-        JWT_SECRET= credentials('JWT_SECRET')
-        GATEWAY_KEYSTORE_PASSWORD= credentials('GATEWAY_KEYSTORE_PASSWORD')
-        MINIO_ROOT_USER= credentials('MINIO_ROOT_USER')
-        MINIO_ROOT_PASSWORD= credentials('MINIO_ROOT_PASSWORD')
-        MONGO_ROOT_USERNAME= credentials('MONGO_ROOT_USERNAME')
-        MONGO_ROOT_PASSWORD= credentials('MONGO_ROOT_PASSWORD')
-        ADMIN_NAME= credentials('ADMIN_NAME')
-        ADMIN_EMAIL= credentials('ADMIN_EMAIL')
-        ADMIN_PASSWORD= credentials('ADMIN_PASSWORD')
+        JWT_SECRET = credentials('JWT_SECRET')
+        GATEWAY_KEYSTORE_PASSWORD = credentials('GATEWAY_KEYSTORE_PASSWORD')
+        MINIO_ROOT_USER = credentials('MINIO_ROOT_USER')
+        MINIO_ROOT_PASSWORD = credentials('MINIO_ROOT_PASSWORD')
+        MONGO_ROOT_USERNAME = credentials('MONGO_ROOT_USERNAME')
+        MONGO_ROOT_PASSWORD = credentials('MONGO_ROOT_PASSWORD')
+        ADMIN_NAME = credentials('ADMIN_NAME')
+        ADMIN_EMAIL = credentials('ADMIN_EMAIL')
+        ADMIN_PASSWORD = credentials('ADMIN_PASSWORD')
     }
 
     stages {
@@ -63,6 +83,13 @@ pipeline {
                 }
 
                 stage('Test') {
+                    when {
+                        expression {
+                            params.TEST_SCOPE == 'all' ||
+                            params.TEST_SCOPE == 'backend'
+                        }
+                    }
+
                     steps {
                         script {
                             def tests = [:]
@@ -104,6 +131,13 @@ pipeline {
                 }
 
                 stage('Test') {
+                    when {
+                        expression {
+                            params.TEST_SCOPE == 'all' ||
+                            params.TEST_SCOPE == 'frontend'
+                        }
+                    }
+
                     steps {
                         dir('frontend') {
                             sh 'npm test -- --watch=false --browsers=ChromeHeadless'
@@ -134,13 +168,17 @@ pipeline {
                             frontend/certs/frontend.key \
                             frontend/certs/frontend.crt \
                             backend/api-gateway/src/main/resources/gateway-keystore.p12
-                        
-                        mkdir -p frontend/certs/ && cp "$TLS_KEY" "$TLS_CRT" frontend/certs/
+
+                        mkdir -p frontend/certs
+
+                        cp "$TLS_KEY" "$TLS_CRT" frontend/certs/
 
                         cp "$KEYSTORE_FILE" \
-                        backend/api-gateway/src/main/resources/gateway-keystore.p12
+                            backend/api-gateway/src/main/resources/gateway-keystore.p12
 
-                        docker compose -f docker-compose.jenkins.yml up -d --build
+                        docker compose \
+                            -f docker-compose.jenkins.yml \
+                            up -d --build
                     '''
                 }
             }
@@ -169,6 +207,14 @@ pipeline {
                 failure {
                     script {
                         echo "Deployment verification failed."
+
+                        if (!params.ROLLBACK_ON_FAILURE) {
+                            echo "Rollback is disabled."
+                            error(
+                                "Deployment verification failed and rollback is disabled."
+                            )
+                        }
+
                         echo "Starting rollback..."
 
                         def previousBuild = currentBuild.previousSuccessfulBuild
@@ -187,7 +233,9 @@ pipeline {
 
                             echo "Rolling back to version: \$IMAGE_TAG"
 
-                            docker compose -f docker-compose.jenkins.yml up -d --no-build
+                            docker compose \
+                                -f docker-compose.jenkins.yml \
+                                up -d --no-build
                         """
 
                         echo "Rollback to ${previousVersion} completed."
@@ -205,40 +253,57 @@ pipeline {
     post {
 
         success {
-            catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                mail(
-                    to: env.NOTIFICATION_EMAIL,
-                    subject: "Build #${env.BUILD_NUMBER} — ${env.JOB_NAME} — SUCCESS",
-                    body: """
-                            Build completed successfully.
+            script {
+                if (params.SEND_NOTIFICATIONS) {
+                    catchError(
+                        buildResult: 'SUCCESS',
+                        stageResult: 'UNSTABLE'
+                    ) {
+                        mail(
+                            to: env.NOTIFICATION_EMAIL,
+                            subject: "Build #${env.BUILD_NUMBER} — ${env.JOB_NAME} — SUCCESS",
+                            body: """
+                                Build completed successfully.
 
-                            Job: ${env.JOB_NAME}
-                            Build: #${env.BUILD_NUMBER}
-                            Version: ${env.IMAGE_TAG}
-                            Status: SUCCESS
+                                Job: ${env.JOB_NAME}
+                                Build: #${env.BUILD_NUMBER}
+                                Version: ${env.IMAGE_TAG}
+                                Test scope: ${params.TEST_SCOPE}
+                                Status: SUCCESS
 
-                            The application was built, tested, and deployed successfully.
-                        """.stripIndent()
-                )
+                                The application was built, tested, and deployed successfully.
+                            """.stripIndent()
+                        )
+                    }
+                }
             }
         }
 
         failure {
-            catchError(buildResult: 'FAILURE', stageResult: 'UNSTABLE') {
-                mail(
-                    to: env.NOTIFICATION_EMAIL,
-                    subject: "Build #${env.BUILD_NUMBER} — ${env.JOB_NAME} — FAILURE",
-                    body: """
-                            Build failed.
+            script {
+                if (params.SEND_NOTIFICATIONS) {
+                    catchError(
+                        buildResult: 'FAILURE',
+                        stageResult: 'UNSTABLE'
+                    ) {
+                        mail(
+                            to: env.NOTIFICATION_EMAIL,
+                            subject: "Build #${env.BUILD_NUMBER} — ${env.JOB_NAME} — FAILURE",
+                            body: """
+                                Build failed.
 
-                            Job: ${env.JOB_NAME}
-                            Build: #${env.BUILD_NUMBER}
-                            Version: ${env.IMAGE_TAG}
-                            Status: FAILURE
-                        """.stripIndent()
-                )
+                                Job: ${env.JOB_NAME}
+                                Build: #${env.BUILD_NUMBER}
+                                Version: ${env.IMAGE_TAG}
+                                Test scope: ${params.TEST_SCOPE}
+                                Status: FAILURE
+
+                                Check the Jenkins console output for details.
+                            """.stripIndent()
+                        )
+                    }
+                }
             }
         }
     }
-
 }
