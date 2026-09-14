@@ -1,7 +1,7 @@
 jenkins:
   systemMessage: "MR-Jenk CI/CD"
 
-  numExecutors: 2
+  numExecutors: 0
 
   securityRealm:
     local:
@@ -9,6 +9,10 @@ jenkins:
       users:
         - id: "myacoubi"
           name: "myacoubi"
+          password: "${JENKINS_ADMIN_PASSWORD}"
+
+        - id: "anlazaar"
+          name: "anlazaar"
           password: "${JENKINS_ADMIN_PASSWORD}"
 
   authorizationStrategy:
@@ -32,13 +36,13 @@ jenkins:
         launcher:
           inbound: {}
     
-    # - permanent:
-    #     name: "deployment-node"
-    #     remoteFS: "/home/jenkins"
-    #     labelString: "deployment"
-    #     mode: EXCLUSIVE
-    #     launcher:
-    #       inbound: {}
+    - permanent:
+        name: "deployment-node"
+        remoteFS: "/home/jenkins"
+        labelString: "deployment"
+        mode: EXCLUSIVE
+        launcher:
+          inbound: {}
     
 
 jobs:

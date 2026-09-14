@@ -157,7 +157,7 @@ pipeline {
 
         stage('Deploy') {
             agent {
-                label 'built-in'
+                label 'deployment'
             }
 
             steps {
@@ -198,7 +198,7 @@ pipeline {
 
         stage('Deployment Verification') {
             agent {
-                label 'built-in'
+                label 'deployment'
             }
             
             steps {

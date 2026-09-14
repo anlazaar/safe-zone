@@ -7,5 +7,5 @@ credentials-binding
 junit
 mailer
 theme-manager
-
+pipeline-stage-view
 job-dsl
