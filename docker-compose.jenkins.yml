@@ -5,15 +5,11 @@ services:
 
     ports:
       - "4200:8080"
-    networks:
-      - frontend-network
 
   eureka:
     image: mr-jenk/eureka:${IMAGE_TAG}
     build: ./backend/eureka
-    networks:
-      - backend-network
-    
+
     healthcheck:
       test:
         [
@@ -31,9 +27,7 @@ services:
   user:
     image: mr-jenk/user-service:${IMAGE_TAG}
     build: ./backend/user-service
-    networks:
-      - backend-network
-    
+
     depends_on:
       eureka:
         condition: service_healthy
@@ -67,9 +61,7 @@ services:
   product:
     image: mr-jenk/product-service:${IMAGE_TAG}
     build: ./backend/product-service
-    networks:
-      - backend-network
-    
+
     depends_on:
       eureka:
         condition: service_healthy
@@ -98,9 +90,7 @@ services:
   media:
     image: mr-jenk/media-service:${IMAGE_TAG}
     build: ./backend/media-service
-    networks:
-      - backend-network
-    
+
     depends_on:
       eureka:
         condition: service_healthy
@@ -135,9 +125,7 @@ services:
   audit:
     image: mr-jenk/audit-service:${IMAGE_TAG}
     build: ./backend/audit-service
-    networks:
-      - backend-network
-    
+
     depends_on:
       eureka:
         condition: service_healthy
@@ -168,9 +156,7 @@ services:
   api-gateway:
     image: mr-jenk/api-gateway:${IMAGE_TAG}
     build: ./backend/api-gateway
-    networks:
-      - backend-network
-    
+
     depends_on:
       product:
         condition: service_healthy
@@ -208,9 +194,7 @@ services:
 
   kafka:
     image: apache/kafka:4.1.0
-    networks:
-      - backend-network
-    
+
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
@@ -243,9 +227,7 @@ services:
 
   mongodb:
     image: mongo:8
-    networks:
-      - backend-network
-    
+
     restart: unless-stopped
 
     environment:
@@ -257,9 +239,7 @@ services:
 
   minio:
     image: minio/minio
-    networks:
-      - backend-network
-    
+
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
@@ -285,10 +265,3 @@ volumes:
   mongo-data:
   kafka-data:
   minio-data:
-
-networks:
-  frontend-network:
-    internal: true
-
-  backend-network:
-    internal: true
