@@ -50,9 +50,6 @@ pipeline {
         stage('Backend CI') {
             agent {
                 label 'backend'
-                // docker {
-                //     image 'eclipse-temurin:21-jdk'
-                // }
             }
 
             stages {
@@ -115,10 +112,6 @@ pipeline {
         stage('Frontend CI') {
             agent {
                 label 'frontend'
-                // docker {
-                //     image 'frontend-agent:1.0'
-                //     args '--privileged'
-                // }
             }
 
             stages {
@@ -157,7 +150,7 @@ pipeline {
 
         stage('Deploy') {
             agent {
-                label 'built-in'
+                label 'deployment'
             }
 
             steps {
@@ -198,7 +191,7 @@ pipeline {
 
         stage('Deployment Verification') {
             agent {
-                label 'built-in'
+                label 'deployment'
             }
             
             steps {
