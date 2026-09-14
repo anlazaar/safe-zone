@@ -155,7 +155,7 @@ pipeline {
 
             steps {
                 checkout scm
-                
+
                 withCredentials([
                     file(
                         credentialsId: 'TLS_KEY',
@@ -178,14 +178,15 @@ pipeline {
 
                         mkdir -p frontend/certs
 
-                        cp "$TLS_KEY" "$TLS_CRT" frontend/certs/
+                        cp "$TLS_KEY" frontend/certs/frontend.key
+                        cp "$TLS_CRT" frontend/certs/frontend.crt
 
                         cp "$KEYSTORE_FILE" \
                             backend/api-gateway/src/main/resources/gateway-keystore.p12
 
                         docker compose \
                             -f docker-compose.jenkins.yml \
-                            up -d --build --wait
+                            up -d --build
                     '''
                 }
             }
