@@ -169,12 +169,6 @@ pipeline {
                     )
                 ]) {
                     sh '''
-                        whoami
-                        hostname
-                        docker context show
-                        docker info
-                        docker compose ps
-            
                         rm -f \
                             frontend/certs/frontend.key \
                             frontend/certs/frontend.crt \
