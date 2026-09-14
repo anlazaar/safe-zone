@@ -169,6 +169,13 @@ pipeline {
                     )
                 ]) {
                     sh '''
+                        whoami
+                        hostname
+                        docker context show
+                        docker info
+                        docker compose up -d --build
+                        docker compose ps
+            
                         rm -f \
                             frontend/certs/frontend.key \
                             frontend/certs/frontend.crt \
@@ -198,7 +205,13 @@ pipeline {
                 script {
                     retry(6) {
                         def status = sh(
-                            script: "docker inspect --format='{{.State.Health.Status}}' mr-jenk-pipeline-api-gateway-1",
+                            script: '''
+                                docker compose ps
+
+                                test "$(docker inspect \
+                                    --format='{{.State.Health.Status}}' \
+                                    "$(docker compose ps -q api-gateway)")" = "healthy"
+                            ''',
                             returnStdout: true
                         ).trim()
 
