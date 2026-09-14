@@ -1,0 +1,45 @@
+jenkins:
+  systemMessage: "MR-Jenk CI/CD"
+
+  numExecutors: 2
+
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "myacoubi"
+          name: "myacoubi"
+          password: "${JENKINS_ADMIN_PASSWORD}"
+
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+  nodes:
+    - permanent:
+        name: "backend-node"
+        remoteFS: "/home/jenkins"
+        labelString: "backend"
+        mode: EXCLUSIVE
+        launcher:
+          inbound: {}
+
+    - permanent:
+        name: "frontend-node"
+        remoteFS: "/home/jenkins"
+        labelString: "frontend"
+        mode: EXCLUSIVE
+        launcher:
+          inbound: {}
+
+unclassified:
+  location:
+    url: "${JENKINS_URL}"
+
+  mailer:
+    smtpHost: "smtp.gmail.com"
+    smtpPort: 587
+    useTls: true
+    authentication:
+      username: "${SMTP_USERNAME}"
+      password: "${SMTP_PASSWORD}"
