@@ -202,8 +202,6 @@ pipeline {
                     retry(6) {
                         def status = sh(
                             script: '''
-                                docker compose ps
-
                                 test "$(docker inspect \
                                     --format='{{.State.Health.Status}}' \
                                     "$(docker compose ps -q api-gateway)")" = "healthy"
