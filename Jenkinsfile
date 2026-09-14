@@ -8,7 +8,7 @@ def services = [
 ]
 
 pipeline {
-    agent any
+    agent none
 
     parameters {
         choice(
@@ -47,20 +47,21 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
         stage('Backend CI') {
             agent {
-                docker {
-                    image 'eclipse-temurin:21-jdk'
-                }
+                label 'backend'
+                // docker {
+                //     image 'eclipse-temurin:21-jdk'
+                // }
             }
 
             stages {
+
+                stage('Checkout') {
+                    steps {
+                        checkout scm
+                    }
+                }
 
                 stage('Build') {
                     steps {
@@ -113,14 +114,21 @@ pipeline {
 
         stage('Frontend CI') {
             agent {
-                docker {
-                    image 'frontend-agent:1.0'
-                    args '--privileged'
-                }
+                label 'frontend'
+                // docker {
+                //     image 'frontend-agent:1.0'
+                //     args '--privileged'
+                // }
             }
 
             stages {
 
+                stage('Checkout') {
+                    steps {
+                        checkout scm
+                    }
+                }
+        
                 stage('Build') {
                     steps {
                         dir('frontend') {
@@ -148,6 +156,10 @@ pipeline {
         }
 
         stage('Deploy') {
+            agent {
+                label 'built-in'
+            }
+
             steps {
                 withCredentials([
                     file(
@@ -185,6 +197,10 @@ pipeline {
         }
 
         stage('Deployment Verification') {
+            agent {
+                label 'built-in'
+            }
+            
             steps {
                 script {
                     retry(6) {
@@ -271,7 +287,7 @@ pipeline {
                                 Test scope: ${params.TEST_SCOPE}
                                 Status: SUCCESS
 
-                                The application was built, tested, and deployed successfully.
+                                The application was built, tested, and deployed successfully, for logs see ${env.BUILD_URL}.
                             """.stripIndent()
                         )
                     }
