@@ -3,7 +3,7 @@ def services = [
     'user-service',
     'product-service',
     'api-gateway',
-    'eureka'
+    'eureka',
     'audit-service'
 ]
 
