@@ -173,7 +173,6 @@ pipeline {
                         hostname
                         docker context show
                         docker info
-                        docker compose up -d --wait --build
                         docker compose ps
             
                         rm -f \
@@ -190,7 +189,7 @@ pipeline {
 
                         docker compose \
                             -f docker-compose.jenkins.yml \
-                            up -d --build
+                            up -d --build --wait
                     '''
                 }
             }
