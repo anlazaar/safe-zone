@@ -154,6 +154,8 @@ pipeline {
             }
 
             steps {
+                checkout scm
+                
                 withCredentials([
                     file(
                         credentialsId: 'TLS_KEY',
