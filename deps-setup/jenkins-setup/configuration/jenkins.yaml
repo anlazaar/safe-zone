@@ -1,0 +1,128 @@
+jenkins:
+  systemMessage: "MR-Jenk CI/CD"
+
+  numExecutors: 2
+
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "myacoubi"
+          name: "myacoubi"
+          password: "${JENKINS_ADMIN_PASSWORD}"
+
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+  nodes:
+    - permanent:
+        name: "backend-node"
+        remoteFS: "/home/jenkins"
+        labelString: "backend"
+        mode: EXCLUSIVE
+        launcher:
+          inbound: {}
+
+    - permanent:
+        name: "frontend-node"
+        remoteFS: "/home/jenkins"
+        labelString: "frontend"
+        mode: EXCLUSIVE
+        launcher:
+          inbound: {}
+    
+    # - permanent:
+    #     name: "deployment-node"
+    #     remoteFS: "/home/jenkins"
+    #     labelString: "deployment"
+    #     mode: EXCLUSIVE
+    #     launcher:
+    #       inbound: {}
+    
+
+jobs:
+  - script: >
+      pipelineJob('mr-jenk') {
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote {
+                  url('https://github.com/diabloN1/mr-jenk.git')
+                }
+                branch('*/main')
+              }
+            }
+            scriptPath('Jenkinsfile')
+          }
+        }
+      }
+
+unclassified:
+  location:
+    url: "${JENKINS_URL}"
+
+  mailer:
+    smtpHost: "smtp.gmail.com"
+    smtpPort: 587
+    useTls: true
+    authentication:
+      username: "${SMTP_USERNAME}"
+      password: "${SMTP_PASSWORD}"
+
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+
+          - usernamePassword:
+              id: "github"
+              username: "${GITHUB_USERNAME}"
+              password: "${GITHUB_TOKEN}"
+              description: "GitHub credentials"
+
+          - string:
+              id: "JWT_SECRET"
+              secret: "${JWT_SECRET}"
+              description: "JWT secret"
+
+          - string:
+              id: "GATEWAY_KEYSTORE_PASSWORD"
+              secret: "${GATEWAY_KEYSTORE_PASSWORD}"
+              description: "Gateway keystore password"
+
+          - string:
+              id: "MINIO_ROOT_USER"
+              secret: "${MINIO_ROOT_USER}"
+              description: "MinIO root username"
+
+          - string:
+              id: "MINIO_ROOT_PASSWORD"
+              secret: "${MINIO_ROOT_PASSWORD}"
+              description: "MinIO root password"
+
+          - string:
+              id: "MONGO_ROOT_USERNAME"
+              secret: "${MONGO_ROOT_USERNAME}"
+              description: "MongoDB root username"
+
+          - string:
+              id: "MONGO_ROOT_PASSWORD"
+              secret: "${MONGO_ROOT_PASSWORD}"
+              description: "MongoDB root password"
+
+          - string:
+              id: "ADMIN_NAME"
+              secret: "${ADMIN_NAME}"
+              description: "Application admin name"
+
+          - string:
+              id: "ADMIN_EMAIL"
+              secret: "${ADMIN_EMAIL}"
+              description: "Application admin email"
+
+          - string:
+              id: "ADMIN_PASSWORD"
+              secret: "${ADMIN_PASSWORD}"
+              description: "Application admin password"

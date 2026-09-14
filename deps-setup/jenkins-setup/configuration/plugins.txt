@@ -1,0 +1,11 @@
+configuration-as-code
+workflow-aggregator
+git
+docker-workflow
+credentials
+credentials-binding
+junit
+mailer
+theme-manager
+
+job-dsl
