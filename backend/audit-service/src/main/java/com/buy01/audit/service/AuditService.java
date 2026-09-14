@@ -34,7 +34,7 @@ public class AuditService {
                         .isAdmin(event.isAdmin())
                         .timestamp(event.timestamp())
                         .build();
-                
+
                 userRepo.save(userAudit);
                 break;
 
@@ -47,7 +47,7 @@ public class AuditService {
                         .isAdmin(event.isAdmin())
                         .timestamp(event.timestamp())
                         .build();
-                
+
                 productRepo.save(productAudit);
                 break;
 
@@ -60,7 +60,7 @@ public class AuditService {
                         .isAdmin(event.isAdmin())
                         .timestamp(event.timestamp())
                         .build();
-                
+
                 mediaRepo.save(mediaAudit);
                 break;
         }

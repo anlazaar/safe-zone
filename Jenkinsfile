@@ -4,6 +4,7 @@ def services = [
     'product-service',
     'api-gateway',
     'eureka'
+    'audit-service'
 ]
 
 pipeline {
