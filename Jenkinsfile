@@ -209,6 +209,7 @@ pipeline {
                             returnStdout: true
                         ).trim()
 
+                        echo "API Gateway health status: ${status}"
                         if (status != 'healthy') {
                             sleep 5
                             error("API Gateway is not healthy")
