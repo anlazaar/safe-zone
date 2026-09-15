@@ -105,6 +105,12 @@ pipeline {
                             parallel tests
                         }
                     }
+                    
+                    post {
+                        always {
+                            junit 'backend/**/target/surefire-reports/*.xml'
+                        }
+                    }
                 }
             }
         }
@@ -141,7 +147,13 @@ pipeline {
 
                     steps {
                         dir('frontend') {
-                            sh 'npm test -- --watch=false --browsers=ChromeHeadless'
+                            sh 'npm test'
+                        }
+                    }
+
+                    post {
+                        always {
+                            junit 'frontend/test-reports/reports.xml'
                         }
                     }
                 }
