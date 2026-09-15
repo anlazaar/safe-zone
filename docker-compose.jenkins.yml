@@ -6,6 +6,20 @@ services:
     ports:
       - "4200:8080"
 
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "--insecure",
+          "--fail",
+          "https://localhost:8080/health",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
   eureka:
     image: mr-jenk/eureka:${IMAGE_TAG}
     build: ./backend/eureka
