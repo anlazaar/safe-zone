@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<testsuite name="Chrome Headless 152.0.0.0 (Ubuntu 0.0.0)" package="" timestamp="2026-09-15T02:06:00" id="0" hostname="ubuntu" tests="86" errors="0" failures="0" time="0.443">
+  <properties>
+    <property name="browser.fullName" value="Mozilla/5.0 (X11; Ubuntu; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36"/>
+  </properties>
+  <testcase name="AuthService logout should send POST request to /api/v1/auth/logout and clear storage" time="0.015" classname="AuthService logout"/>
+  <testcase name="AuthService register should send POST request to /api/v1/auth/register and save token" time="0.003" classname="AuthService register"/>
+  <testcase name="AuthService login should send POST request to /api/v1/auth/login and save token" time="0.001" classname="AuthService login"/>
+  <testcase name="AuthService should be created" time="0.001" classname="AuthService"/>
+  <testcase name="AppComponent should create the app and initialize theme" time="0.076" classname="AppComponent"/>
+  <testcase name="LoadingSpinnerComponent should create loading spinner" time="0.006" classname="LoadingSpinnerComponent"/>
+  <testcase name="SessionService should initialize session when no token present" time="0.002" classname="SessionService"/>
+  <testcase name="ProductCardComponent should display product details" time="0.01" classname="ProductCardComponent"/>
+  <testcase name="RegisterPage should initialize with empty invalid form" time="0.035" classname="RegisterPage"/>
+  <testcase name="UserService get should return user by id" time="0.001" classname="UserService get"/>
+  <testcase name="UserService getWidget should return user widget by id" time="0.001" classname="UserService getWidget"/>
+  <testcase name="UserService list should send correct pagination params" time="0.001" classname="UserService list"/>
+  <testcase name="UserService list should return paginated list of users" time="0" classname="UserService list"/>
+  <testcase name="UserService should be created" time="0" classname="UserService"/>
+  <testcase name="UserService delete should delete user by id" time="0" classname="UserService delete"/>
+  <testcase name="UserService count should return user count" time="0" classname="UserService count"/>
+  <testcase name="UserService me should return current user profile" time="0" classname="UserService me"/>
+  <testcase name="CurrentUserService should be created" time="0" classname="CurrentUserService"/>
+  <testcase name="CurrentUserService clear should set user to null" time="0" classname="CurrentUserService clear"/>
+  <testcase name="CurrentUserService load should call userService.me when force=true even if user is already loaded" time="0" classname="CurrentUserService load"/>
+  <testcase name="CurrentUserService load should not call userService.me when already loading" time="0" classname="CurrentUserService load"/>
+  <testcase name="LoginPage should initialize with empty invalid form" time="0.012" classname="LoginPage"/>
+  <testcase name="LoginPage should login successfully and navigate" time="0.02" classname="LoginPage"/>
+  <testcase name="roleGuard should deny access and redirect if user lacks role" time="0.001" classname="roleGuard"/>
+  <testcase name="roleGuard should allow access if user has required role" time="0" classname="roleGuard"/>
+  <testcase name="HomePage should load products on init" time="0.014" classname="HomePage"/>
+  <testcase name="NotFoundPage should create 404 page" time="0.006" classname="NotFoundPage"/>
+  <testcase name="ThemeService should initialize saved dark theme from localStorage" time="0.002" classname="ThemeService"/>
+  <testcase name="ThemeService should initialize default light theme" time="0.001" classname="ThemeService"/>
+  <testcase name="ThemeService should toggle theme mode" time="0.001" classname="ThemeService"/>
+  <testcase name="authGuard should allow navigation if user is authenticated" time="0.001" classname="authGuard"/>
+  <testcase name="authGuard should redirect to /auth/login with returnUrl if unauthenticated" time="0.001" classname="authGuard"/>
+  <testcase name="ProductDetailsPage should fetch product details and seller widget" time="0.018" classname="ProductDetailsPage"/>
+  <testcase name="ProductFormPage should initialize empty form in create mode" time="0.022" classname="ProductFormPage"/>
+  <testcase name="MediaService should return correct image URL" time="0.001" classname="MediaService"/>
+  <testcase name="MediaService should delete media file" time="0.001" classname="MediaService"/>
+  <testcase name="MediaService should get total media count" time="0.001" classname="MediaService"/>
+  <testcase name="MediaService should fetch paginated user media" time="0.001" classname="MediaService"/>
+  <testcase name="AdminUsersPage should load users on init" time="0.023" classname="AdminUsersPage"/>
+  <testcase name="jwt.util decodeJwt should return null for an invalid JWT string" time="0" classname="jwt.util decodeJwt"/>
+  <testcase name="jwt.util decodeJwt should return decoded payload for a valid JWT token" time="0" classname="jwt.util decodeJwt"/>
+  <testcase name="jwt.util isExpired should return false if token has no exp claim" time="0.001" classname="jwt.util isExpired"/>
+  <testcase name="jwt.util isExpired should return true if token exp is in the past" time="0" classname="jwt.util isExpired"/>
+  <testcase name="jwt.util isExpired should return false if token exp is in the future" time="0" classname="jwt.util isExpired"/>
+  <testcase name="ProductListPage should trigger search on query change with debounce" time="0.024" classname="ProductListPage"/>
+  <testcase name="ProductListPage should load products on init" time="0.009" classname="ProductListPage"/>
+  <testcase name="TokenStorage should clear token from localStorage" time="0.001" classname="TokenStorage"/>
+  <testcase name="TokenStorage should store and retrieve token" time="0.001" classname="TokenStorage"/>
+  <testcase name="TokenStorage should be created" time="0.001" classname="TokenStorage"/>
+  <testcase name="AdminProductsPage should load products on init" time="0.018" classname="AdminProductsPage"/>
+  <testcase name="GlobalErrorHandler should handle non-Error objects and notify generic message" time="0.001" classname="GlobalErrorHandler"/>
+  <testcase name="GlobalErrorHandler should handle Error object and notify error message" time="0.001" classname="GlobalErrorHandler"/>
+  <testcase name="ProductService should get product by id" time="0" classname="ProductService"/>
+  <testcase name="ProductService should delete product by id" time="0" classname="ProductService"/>
+  <testcase name="ProductService should list products with pagination" time="0.001" classname="ProductService"/>
+  <testcase name="ConfirmDialogComponent should create component and render title &amp; message" time="0.005" classname="ConfirmDialogComponent"/>
+  <testcase name="ConfirmDialogComponent should close dialog with false on cancel click" time="0.003" classname="ConfirmDialogComponent"/>
+  <testcase name="ConfirmDialogComponent should close dialog with true on confirm click" time="0.003" classname="ConfirmDialogComponent"/>
+  <testcase name="SafeUrlPipe should return empty string if url is null or undefined or empty" time="0.001" classname="SafeUrlPipe"/>
+  <testcase name="SafeUrlPipe should bypass security trust for valid URL string" time="0.001" classname="SafeUrlPipe"/>
+  <testcase name="SellerProductsPage should load seller products on init" time="0.022" classname="SellerProductsPage"/>
+  <testcase name="validators passwordStrength should return weakPassword error if password has no numbers" time="0" classname="validators passwordStrength"/>
+  <testcase name="validators passwordStrength should return weakPassword error if password is less than 8 characters" time="0" classname="validators passwordStrength"/>
+  <testcase name="validators passwordStrength should return null for empty string or null value" time="0" classname="validators passwordStrength"/>
+  <testcase name="validators passwordStrength should return null for valid password with 8+ chars, letters and numbers" time="0.001" classname="validators passwordStrength"/>
+  <testcase name="validators passwordStrength should return weakPassword error if password has no letters" time="0" classname="validators passwordStrength"/>
+  <testcase name="ProfilePage should load user profile details on init" time="0.012" classname="ProfilePage"/>
+  <testcase name="ProfilePage should update profile when form is saved" time="0.005" classname="ProfilePage"/>
+  <testcase name="ProfilePage should delete avatar when deleteAvatar is called" time="0.006" classname="ProfilePage"/>
+  <testcase name="ProfileService should update profile" time="0.001" classname="ProfileService"/>
+  <testcase name="ProfileService should get current profile (me)" time="0" classname="ProfileService"/>
+  <testcase name="SellerDashboardPage should load seller statistics and recent products" time="0.007" classname="SellerDashboardPage"/>
+  <testcase name="NotificationService should show success snackbar" time="0" classname="NotificationService"/>
+  <testcase name="NotificationService should show info snackbar" time="0" classname="NotificationService"/>
+  <testcase name="NotificationService should show error snackbar" time="0.001" classname="NotificationService"/>
+  <testcase name="FileDropDirective should create host component with directive" time="0.002" classname="FileDropDirective"/>
+  <testcase name="EmptyStateComponent should emit action event when button is clicked" time="0.002" classname="EmptyStateComponent"/>
+  <testcase name="EmptyStateComponent should render default icon and title" time="0.002" classname="EmptyStateComponent"/>
+  <testcase name="EmptyStateComponent should render custom title, description, and action button" time="0.002" classname="EmptyStateComponent"/>
+  <testcase name="AdminDashboardPage should load aggregated dashboard counts on init" time="0.006" classname="AdminDashboardPage"/>
+  <testcase name="FieldErrorComponent should render required error when control is touched and invalid" time="0.001" classname="FieldErrorComponent"/>
+  <testcase name="FieldErrorComponent should not render error text if control is untouched or has no errors" time="0.001" classname="FieldErrorComponent"/>
+  <testcase name="FieldErrorComponent should render weakPassword error message" time="0.001" classname="FieldErrorComponent"/>
+  <testcase name="FieldErrorComponent should render email error message" time="0.001" classname="FieldErrorComponent"/>
+  <testcase name="ImagePreviewComponent should create and bind input signals" time="0.003" classname="ImagePreviewComponent"/>
+  <testcase name="MediaManagementPage should load user media on init" time="0.018" classname="MediaManagementPage"/>
+  <system-out>
+    <![CDATA[
+]]>
+  </system-out>
+  <system-err/>
+</testsuite>

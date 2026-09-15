@@ -97,7 +97,7 @@ pipeline {
 
                                 tests[currentService] = {
                                     dir("backend/${currentService}") {
-                                        sh './mvnw test'
+                                        sh './mvnw clean test'
                                     }
                                 }
                             }
