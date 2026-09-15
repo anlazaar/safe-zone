@@ -212,20 +212,27 @@ pipeline {
             steps {
                 script {
                     retry(6) {
-                        def status = sh(
-                            script: '''
-                                docker inspect \
-                                    --format='{{.State.Health.Status}}' \
-                                    "$(docker compose ps -q api-gateway)"
-                            ''',
-                            returnStdout: true
-                        ).trim()
+                        sh '''
+                            for container in $(docker compose ps -q); do
+                                name=$(docker inspect --format='{{.Name}}' "$container")
 
-                        echo "API Gateway health status: ${status}"
-                        if (status != 'healthy') {
-                            sleep 5
-                            error("API Gateway is not healthy")
-                        }
+                                health=$(docker inspect \
+                                    --format='{{if .State.Health}}{{.State.Health.Status}}{{end}}' \
+                                    "$container")
+
+                                if [ -z "$health" ]; then
+                                    echo "$name: no healthcheck (OK)"
+                                elif [ "$health" = "healthy" ]; then
+                                    echo "$name: healthy (OK)"
+                                else
+                                    echo "$name: $health (FAIL)"
+                                    sleep 5
+                                    exit 1
+                                fi
+                            done
+                        '''
+
+                        echo "All containers are healthy."
                     }
 
                     echo "Deployment ${env.IMAGE_TAG} is healthy."
