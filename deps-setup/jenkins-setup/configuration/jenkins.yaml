@@ -16,8 +16,33 @@ jenkins:
           password: "${JENKINS_ADMIN_PASSWORD}"
 
   authorizationStrategy:
-    loggedInUsersCanDoAnything:
-      allowAnonymousRead: false
+    roleBased:
+      roles:
+        global:
+          - name: "admin"
+            description: "Full Jenkins administration"
+            permissions:
+              - "Overall/Administer"
+            assignments:
+              - "myacoubi"
+              - "anlazaar"
+
+          - name: "developer"
+            description: "Can view and run Jenkins jobs"
+            permissions:
+              - "Overall/Read"
+              - "Job/Read"
+              - "Job/Build"
+              - "Job/Cancel"
+              - "Job/Workspace"
+            assignments: []
+          - name: "viewer"
+            description: "Read-only Jenkins access"
+            permissions:
+              - "Overall/Read"
+              - "Job/Read"
+              - "View/Read"
+            assignments: []
 
   nodes:
     - permanent:
