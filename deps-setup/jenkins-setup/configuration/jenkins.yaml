@@ -20,7 +20,6 @@ jenkins:
       roles:
         global:
           - name: "admin"
-            description: "Full Jenkins administration"
             permissions:
               - "Overall/Administer"
             assignments:
@@ -28,7 +27,6 @@ jenkins:
               - "anlazaar"
 
           - name: "developer"
-            description: "Can view and run Jenkins jobs"
             permissions:
               - "Overall/Read"
               - "Job/Read"
@@ -36,8 +34,8 @@ jenkins:
               - "Job/Cancel"
               - "Job/Workspace"
             assignments: []
+
           - name: "viewer"
-            description: "Read-only Jenkins access"
             permissions:
               - "Overall/Read"
               - "Job/Read"
