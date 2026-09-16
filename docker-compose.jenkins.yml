@@ -252,7 +252,7 @@ services:
       - mongo-data:/data/db
 
   minio:
-    image: minio/minio:latest
+    image: quay.io/minio/minio:latest
 
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
