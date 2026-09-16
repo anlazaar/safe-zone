@@ -9,3 +9,4 @@ mailer
 theme-manager
 pipeline-stage-view
 job-dsl
+role-strategy

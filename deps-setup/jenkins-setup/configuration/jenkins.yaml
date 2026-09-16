@@ -22,9 +22,9 @@ jenkins:
           - name: "admin"
             permissions:
               - "Overall/Administer"
-            assignments:
-              - "myacoubi"
-              - "anlazaar"
+            entries:
+              - user: "myacoubi"
+              - user: "anlazaar"
 
           - name: "developer"
             permissions:
@@ -33,14 +33,14 @@ jenkins:
               - "Job/Build"
               - "Job/Cancel"
               - "Job/Workspace"
-            assignments: []
+            entries: []
 
           - name: "viewer"
             permissions:
               - "Overall/Read"
               - "Job/Read"
               - "View/Read"
-            assignments: []
+            entries: []
 
   nodes:
     - permanent:

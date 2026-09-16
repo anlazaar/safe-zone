@@ -47,6 +47,17 @@ pipeline {
 
     stages {
 
+        stage('Checkout Source') {
+            agent {
+                label 'backend'
+            }
+
+            steps {
+                checkout scm
+                stash name: 'source', includes: '**'
+            }
+        }
+
         stage('Backend CI') {
             agent {
                 label 'backend'
@@ -56,7 +67,7 @@ pipeline {
 
                 stage('Checkout') {
                     steps {
-                        checkout scm
+                        unstash 'source'
                     }
                 }
 
@@ -124,7 +135,7 @@ pipeline {
 
                 stage('Checkout') {
                     steps {
-                        checkout scm
+                        unstash 'source'
                     }
                 }
         
@@ -166,7 +177,7 @@ pipeline {
             }
 
             steps {
-                checkout scm
+                unstash 'source'
 
                 withCredentials([
                     file(
