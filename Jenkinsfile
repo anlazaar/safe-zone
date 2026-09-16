@@ -10,6 +10,10 @@ def services = [
 pipeline {
     agent none
 
+    options {
+        skipDefaultCheckout(true)
+    }
+    
     parameters {
         choice(
             name: 'TEST_SCOPE',
