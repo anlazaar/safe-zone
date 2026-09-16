@@ -31,7 +31,6 @@ import org.springframework.http.HttpMethod;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
 
     @Value("${jwt.secret}")
@@ -39,6 +38,10 @@ public class SecurityConfig {
 
     private final RateLimitFilter rateLimitFilter;
 
+    public SecurityConfig(RateLimitFilter rateLimitFilter) {
+        this.rateLimitFilter = rateLimitFilter;
+    }
+    
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
