@@ -67,6 +67,7 @@ pipeline {
 
                 stage('Checkout') {
                     steps {
+                        deleteDir()
                         unstash 'source'
                     }
                 }
@@ -135,6 +136,7 @@ pipeline {
 
                 stage('Checkout') {
                     steps {
+                        deleteDir()
                         unstash 'source'
                     }
                 }
@@ -177,6 +179,7 @@ pipeline {
             }
 
             steps {
+                deleteDir()
                 unstash 'source'
 
                 withCredentials([
