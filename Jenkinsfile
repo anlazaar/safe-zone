@@ -192,7 +192,7 @@ pipeline {
                             sh './mvnw package -DskipTests'
                         }
                     }
-                    
+
                     def scannerHome = tool 'SonarScanner'
 
                     withSonarQubeEnv('SonarQube') {
@@ -201,6 +201,7 @@ pipeline {
                 }
             }
         }
+
 
         stage('Quality Gate') {
             agent none
