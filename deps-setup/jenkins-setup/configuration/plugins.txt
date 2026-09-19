@@ -10,3 +10,4 @@ theme-manager
 pipeline-stage-view
 job-dsl
 role-strategy
+sonar

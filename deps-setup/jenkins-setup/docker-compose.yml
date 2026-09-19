@@ -33,5 +33,11 @@ services:
     volumes:
       - jenkins_home:/var/jenkins_home
 
+    networks:
+      - ci-network
 volumes:
   jenkins_home:
+
+networks:
+  ci-network:
+    external: true
