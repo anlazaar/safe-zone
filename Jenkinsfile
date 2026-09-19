@@ -190,7 +190,7 @@ pipeline {
                     def scannerHome = tool 'SonarScanner'
 
                     withSonarQubeEnv('SonarQube') {
-                        sh '${scannerHome}/bin/sonar-scanner'
+                        sh "${scannerHome}/bin/sonar-scanner"
                     }
                 }
             }
@@ -198,7 +198,7 @@ pipeline {
 
         stage('Quality Gate') {
             agent none
-            
+
             steps {
                 timeout(time: 10, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
