@@ -177,7 +177,39 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+            agent {
+                label 'backend'
+            }
+
+            steps {
+                deleteDir()
+                checkout scm
+
+                script {
+                    def scannerHome = tool 'SonarScanner'
+
+                    withSonarQubeEnv('SonarQube') {
+                        sh '${scannerHome}/bin/sonar-scanner'
+                    }
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            agent none
+            
+            steps {
+                timeout(time: 10, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
         stage('Deploy') {
+            when {
+                branch 'main'
+            }
             agent {
                 label 'deployment'
             }
@@ -223,6 +255,9 @@ pipeline {
         }
 
         stage('Deployment Verification') {
+            when {
+                branch 'main'
+            }
             agent {
                 label 'deployment'
             }
