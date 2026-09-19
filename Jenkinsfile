@@ -187,6 +187,12 @@ pipeline {
                 checkout scm
 
                 script {
+                    services.each { service -> 
+                        dir("backend/${service}") {
+                            sh './mvnw package -DskipTests'
+                        }
+                    }
+                    
                     def scannerHome = tool 'SonarScanner'
 
                     withSonarQubeEnv('SonarQube') {
