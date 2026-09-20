@@ -1,6 +1,6 @@
 services:
   sonarqube:
-    image: sonarqube:lts-community
+    image: sonarqube:9.9.8-community
     container_name: sonarqube
     ports:
       - "9000:9000"

@@ -45,7 +45,7 @@ jenkins:
   nodes:
     - permanent:
         name: "backend-node"
-        remoteFS: "/home/myacoubi/jenkins"
+        remoteFS: "/home/anlazaar/jenkins"
         labelString: "backend"
         mode: EXCLUSIVE
         launcher:
@@ -53,7 +53,7 @@ jenkins:
 
     - permanent:
         name: "frontend-node"
-        remoteFS: "/home/myacoubi/jenkins"
+        remoteFS: "/home/anlazaar/jenkins"
         labelString: "frontend"
         mode: EXCLUSIVE
         launcher:
@@ -61,7 +61,7 @@ jenkins:
 
     - permanent:
         name: "deployment-node"
-        remoteFS: "/home/myacoubi/jenkins"
+        remoteFS: "/home/anlazaar/jenkins"
         labelString: "deployment"
         mode: EXCLUSIVE
         launcher:
