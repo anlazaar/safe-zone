@@ -113,7 +113,7 @@ pipeline {
 
                                 tests[currentService] = {
                                     dir("backend/${currentService}") {
-                                        sh './mvnw clean test'
+                                        sh './mvnw clean verify'
                                     }
                                 }
                             }
@@ -126,6 +126,16 @@ pipeline {
                         always {
                             junit 'backend/**/target/surefire-reports/*.xml'
                         }
+                    }
+                }
+
+                stage('Stash Coverage') {
+                    steps {
+                        stash(
+                            name: 'backend-coverage',
+                            includes: 'backend/**/target/site/jacoco/jacoco.xml',
+                            allowEmpty: true
+                        )
                     }
                 }
             }
@@ -185,6 +195,7 @@ pipeline {
             steps {
                 deleteDir()
                 checkout scm
+                unstash 'backend-coverage'
 
                 script {
                     services.each { service -> 
