@@ -184,6 +184,15 @@ pipeline {
                         }
                     }
                 }
+                stage('Stash Coverage') {
+                    steps {
+                        stash(
+                            name: 'frontend-coverage',
+                            includes: 'frontend/coverage/lcov.info',
+                            allowEmpty: true
+                        )
+                    }
+                }
             }
         }
 
@@ -196,6 +205,7 @@ pipeline {
                 deleteDir()
                 checkout scm
                 unstash 'backend-coverage'
+                unstash 'frontend-coverage'
 
                 script {
                     services.each { service -> 
