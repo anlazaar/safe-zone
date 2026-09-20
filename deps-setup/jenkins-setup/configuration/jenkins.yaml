@@ -45,7 +45,7 @@ jenkins:
   nodes:
     - permanent:
         name: "backend-node"
-        remoteFS: "/home/myacoubi/jenkins"
+        remoteFS: "/home/anlazaar/jenkins"
         labelString: "backend"
         mode: EXCLUSIVE
         launcher:
@@ -53,38 +53,19 @@ jenkins:
 
     - permanent:
         name: "frontend-node"
-        remoteFS: "/home/myacoubi/jenkins"
+        remoteFS: "/home/anlazaar/jenkins"
         labelString: "frontend"
         mode: EXCLUSIVE
         launcher:
           inbound: {}
-    
+
     - permanent:
         name: "deployment-node"
-        remoteFS: "/home/myacoubi/jenkins"
+        remoteFS: "/home/anlazaar/jenkins"
         labelString: "deployment"
         mode: EXCLUSIVE
         launcher:
           inbound: {}
-    
-
-jobs:
-  - script: >
-      pipelineJob('mr-jenk') {
-        definition {
-          cpsScm {
-            scm {
-              git {
-                remote {
-                  url('https://github.com/diabloN1/mr-jenk.git')
-                }
-                branch('*/main')
-              }
-            }
-            scriptPath('Jenkinsfile')
-          }
-        }
-      }
 
 unclassified:
   location:
@@ -98,11 +79,17 @@ unclassified:
       username: "${SMTP_USERNAME}"
       password: "${SMTP_PASSWORD}"
 
+    sonarGlobalConfiguration:
+      buildWrapperEnabled: true
+      installations:
+        - name: "SonarQube"
+          serverUrl: "http://sonarqube:9000"
+          credentialsId: "SONAR_TOKEN"
+
 credentials:
   system:
     domainCredentials:
       - credentials:
-
           - usernamePassword:
               id: "github"
               username: "${GITHUB_USERNAME}"
@@ -153,4 +140,8 @@ credentials:
               id: "ADMIN_PASSWORD"
               secret: "${ADMIN_PASSWORD}"
               description: "Application admin password"
-              
+
+          - string:
+              id: "SONAR_TOKEN"
+              secret: "${SONAR_TOKEN}"
+              description: "SonarQube Token"

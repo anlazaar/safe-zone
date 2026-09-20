@@ -13,7 +13,11 @@ pipeline {
     options {
         skipDefaultCheckout(true)
     }
-    
+
+    triggers {
+        cron('H 2 * * *')
+    }
+
     parameters {
         choice(
             name: 'TEST_SCOPE',
@@ -36,7 +40,7 @@ pipeline {
 
     environment {
         IMAGE_TAG = "1.0.${BUILD_NUMBER}"
-        NOTIFICATION_EMAIL = "amine.yacoubi.med@gmail.com"
+        NOTIFICATION_EMAIL = 'amine.yacoubi.med@gmail.com'
 
         JWT_SECRET = credentials('JWT_SECRET')
         GATEWAY_KEYSTORE_PASSWORD = credentials('GATEWAY_KEYSTORE_PASSWORD')
@@ -50,7 +54,6 @@ pipeline {
     }
 
     stages {
-
         stage('Checkout Source') {
             agent {
                 label 'backend'
@@ -58,7 +61,11 @@ pipeline {
 
             steps {
                 checkout scm
-                stash name: 'source', includes: '**'
+
+                stash(
+                    name: 'source',
+                    includes: '**'
+                )
             }
         }
 
@@ -68,7 +75,6 @@ pipeline {
             }
 
             stages {
-
                 stage('Checkout') {
                     steps {
                         deleteDir()
@@ -113,7 +119,7 @@ pipeline {
 
                                 tests[currentService] = {
                                     dir("backend/${currentService}") {
-                                        sh './mvnw clean test'
+                                        sh './mvnw clean verify'
                                     }
                                 }
                             }
@@ -121,11 +127,21 @@ pipeline {
                             parallel tests
                         }
                     }
-                    
+
                     post {
                         always {
                             junit 'backend/**/target/surefire-reports/*.xml'
                         }
+                    }
+                }
+
+                stage('Stash Coverage') {
+                    steps {
+                        stash(
+                            name: 'backend-coverage',
+                            includes: 'backend/**/target/site/jacoco/jacoco.xml',
+                            allowEmpty: true
+                        )
                     }
                 }
             }
@@ -137,14 +153,13 @@ pipeline {
             }
 
             stages {
-
                 stage('Checkout') {
                     steps {
                         deleteDir()
                         unstash 'source'
                     }
                 }
-        
+
                 stage('Build') {
                     steps {
                         dir('frontend') {
@@ -174,16 +189,90 @@ pipeline {
                         }
                     }
                 }
+
+                stage('Stash Coverage') {
+                    steps {
+                        stash(
+                            name: 'frontend-coverage',
+                            includes: 'frontend/coverage/lcov.info',
+                            allowEmpty: true
+                        )
+                    }
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            agent {
+                label 'backend'
+            }
+
+            steps {
+                deleteDir()
+
+                checkout scm
+
+                script {
+                    if (
+                        params.TEST_SCOPE == 'all' ||
+                        params.TEST_SCOPE == 'backend'
+                    ) {
+                        unstash 'backend-coverage'
+                    }
+
+                    if (
+                        params.TEST_SCOPE == 'all' ||
+                        params.TEST_SCOPE == 'frontend'
+                    ) {
+                        unstash 'frontend-coverage'
+                    }
+
+                    services.each { service ->
+                        dir("backend/${service}") {
+                            sh './mvnw package -DskipTests'
+                        }
+                    }
+
+                    def scannerHome = tool 'SonarScanner'
+
+                    withSonarQubeEnv('SonarQube') {
+                        sh """
+                            ${scannerHome}/bin/sonar-scanner \
+                                -Dsonar.host.url=http://localhost:9000
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            agent none
+
+            steps {
+                timeout(time: 10, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
             }
         }
 
         stage('Deploy') {
+            when {
+                allOf {
+                    branch 'main'
+
+                    not {
+                        triggeredBy 'TimerTrigger'
+                    }
+                }
+            }
+
             agent {
                 label 'deployment'
             }
 
             steps {
                 deleteDir()
+
                 unstash 'source'
 
                 withCredentials([
@@ -223,10 +312,20 @@ pipeline {
         }
 
         stage('Deployment Verification') {
+            when {
+                allOf {
+                    branch 'main'
+
+                    not {
+                        triggeredBy 'TimerTrigger'
+                    }
+                }
+            }
+
             agent {
                 label 'deployment'
             }
-            
+
             steps {
                 script {
                     retry(6) {
@@ -240,8 +339,10 @@ pipeline {
 
                                 if [ -z "$health" ]; then
                                     echo "$name: no healthcheck (OK)"
+
                                 elif [ "$health" = "healthy" ]; then
                                     echo "$name: healthy (OK)"
+
                                 else
                                     echo "$name: $health (FAIL)"
                                     sleep 5
@@ -250,7 +351,7 @@ pipeline {
                             done
                         '''
 
-                        echo "All containers are healthy."
+                        echo 'All containers are healthy.'
                     }
 
                     echo "Deployment ${env.IMAGE_TAG} is healthy."
@@ -260,23 +361,24 @@ pipeline {
             post {
                 failure {
                     script {
-                        echo "Deployment verification failed."
+                        echo 'Deployment verification failed.'
 
                         if (!params.ROLLBACK_ON_FAILURE) {
-                            echo "Rollback is disabled."
+                            echo 'Rollback is disabled.'
+
                             error(
-                                "Deployment verification failed and rollback is disabled."
+                                'Deployment verification failed and rollback is disabled.'
                             )
                         }
 
-                        echo "Starting rollback..."
+                        echo 'Starting rollback...'
 
                         def previousBuild = currentBuild.previousSuccessfulBuild
 
                         if (previousBuild == null) {
                             error(
-                                "No previous successful deployment exists. " +
-                                "Rollback cannot be performed."
+                                'No previous successful deployment exists. ' +
+                                'Rollback cannot be performed.'
                             )
                         }
 
@@ -285,7 +387,7 @@ pipeline {
                         sh """
                             export IMAGE_TAG=${previousVersion}
 
-                            echo "Rolling back to version: \$IMAGE_TAG"
+                            echo "Rolling back to version: \\$IMAGE_TAG"
 
                             docker compose \
                                 -f docker-compose.jenkins.yml \
@@ -295,7 +397,7 @@ pipeline {
                         echo "Rollback to ${previousVersion} completed."
 
                         error(
-                            "Deployment failed. " +
+                            'Deployment failed. ' +
                             "Application rolled back to ${previousVersion}."
                         )
                     }
@@ -305,7 +407,6 @@ pipeline {
     }
 
     post {
-
         success {
             script {
                 if (params.SEND_NOTIFICATIONS) {
@@ -318,14 +419,13 @@ pipeline {
                             subject: "Build #${env.BUILD_NUMBER} — ${env.JOB_NAME} — SUCCESS",
                             body: """
                                 Build completed successfully.
-
                                 Job: ${env.JOB_NAME}
                                 Build: #${env.BUILD_NUMBER}
                                 Version: ${env.IMAGE_TAG}
                                 Test scope: ${params.TEST_SCOPE}
                                 Status: SUCCESS
-
-                                The application was built, tested, and deployed successfully, for logs see ${env.BUILD_URL}.
+                                The application was built, tested, and deployed successfully,
+                                for logs see ${env.BUILD_URL}.
                             """.stripIndent()
                         )
                     }
@@ -345,13 +445,11 @@ pipeline {
                             subject: "Build #${env.BUILD_NUMBER} — ${env.JOB_NAME} — FAILURE",
                             body: """
                                 Build failed.
-
                                 Job: ${env.JOB_NAME}
                                 Build: #${env.BUILD_NUMBER}
                                 Version: ${env.IMAGE_TAG}
                                 Test scope: ${params.TEST_SCOPE}
                                 Status: FAILURE
-
                                 Check the Jenkins console output for details.
                             """.stripIndent()
                         )
