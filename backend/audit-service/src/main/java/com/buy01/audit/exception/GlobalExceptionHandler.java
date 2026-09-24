@@ -24,7 +24,7 @@ import com.buy01.audit.exception.custom.NotFoundException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
         private static final String ERROR_KEY = "error";
-        
+
         @ExceptionHandler(MethodArgumentNotValidException.class)
         public ResponseEntity<Map<String, String>> handleValidation(
                         MethodArgumentNotValidException ex) {

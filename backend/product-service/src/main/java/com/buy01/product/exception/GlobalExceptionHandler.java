@@ -23,7 +23,9 @@ import com.buy01.product.exception.custom.UnauthorizedException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import feign.FeignException;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
         private static final String ERROR_KEY = "error";
@@ -175,8 +177,7 @@ public class GlobalExceptionHandler {
         @ExceptionHandler(Exception.class)
         public ResponseEntity<?> handleGenericException(Exception ex) {
 
-                System.out.println("Error 500: " + ex.getMessage());
-
+                log.error("Unhandled exception occurred", ex);
                 return ResponseEntity
                                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                                 .body(Map.of(

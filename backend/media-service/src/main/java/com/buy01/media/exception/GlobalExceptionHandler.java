@@ -21,7 +21,9 @@ import com.buy01.media.exception.custom.NotFoundException;
 import com.buy01.media.exception.custom.UnauthorizedException;
 
 import feign.FeignException;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
         private static final String ERROR_KEY = "error";
@@ -29,7 +31,6 @@ public class GlobalExceptionHandler {
         @ExceptionHandler(MethodArgumentNotValidException.class)
         public ResponseEntity<Map<String, String>> handleValidation(
                         MethodArgumentNotValidException ex) {
-                
 
                 Map<String, String> errors = new HashMap<>();
 
@@ -156,8 +157,7 @@ public class GlobalExceptionHandler {
         @ExceptionHandler(Exception.class)
         public ResponseEntity<?> handleGenericException(Exception ex) {
 
-                System.out.println("Error 500: " + ex.getMessage());
-
+                log.error("Unhandled exception occurred", ex);
                 return ResponseEntity
                                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                                 .body(Map.of(
