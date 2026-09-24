@@ -79,12 +79,12 @@ unclassified:
       username: "${SMTP_USERNAME}"
       password: "${SMTP_PASSWORD}"
 
-    sonarGlobalConfiguration:
-      buildWrapperEnabled: true
-      installations:
-        - name: "SonarQube"
-          serverUrl: "http://sonarqube:9000"
-          credentialsId: "SONAR_TOKEN"
+  sonarGlobalConfiguration:
+    buildWrapperEnabled: true
+    installations:
+      - name: "SonarQube"
+        serverUrl: "http://sonarqube:9000"
+        credentialsId: "SONAR_TOKEN"
 
 credentials:
   system:
