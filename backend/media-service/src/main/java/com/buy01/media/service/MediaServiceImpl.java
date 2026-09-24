@@ -50,7 +50,7 @@ public class MediaServiceImpl implements MediaService {
         private final S3Client s3Client;
         private final Tika tika = new Tika();
 
-        private static final long MAX_FILE_SIZE = 2 * 1024 * 1024;
+        private static final long MAX_FILE_SIZE = 2L * 1024 * 1024;
 
         @Value("${minio.bucket}")
         private String bucket;
@@ -147,15 +147,6 @@ public class MediaServiceImpl implements MediaService {
                         throw new BadRequestException(
                                         "Only images are allowed.");
                 }
-
-                // System.out.println("======= MEDIA DATDA WIW ========");
-                // System.out.println(file.getOriginalFilename());
-                // System.out.println(file.getContentType());
-                // System.out.println(file.getSize());
-                // System.out.println(file.isEmpty());
-
-                // BufferedImage preview = ImageIO.read(file.getInputStream());
-                // System.out.println(preview);
 
                 String detectedType = tika.detect(file.getInputStream());
 
