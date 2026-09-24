@@ -26,6 +26,7 @@ import feign.FeignException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+        private static final String ERROR_KEY = "error";
 
         @ExceptionHandler(MethodArgumentNotValidException.class)
         public ResponseEntity<Map<String, String>> handleValidation(
@@ -48,7 +49,7 @@ public class GlobalExceptionHandler {
                 return ResponseEntity
                                 .status(HttpStatus.BAD_REQUEST)
                                 .body(Map.of(
-                                                "error", ex.getMessage()));
+                                                ERROR_KEY, ex.getMessage()));
         }
 
         @ExceptionHandler(NotFoundException.class)
@@ -57,7 +58,7 @@ public class GlobalExceptionHandler {
                 return ResponseEntity
                                 .status(HttpStatus.NOT_FOUND)
                                 .body(Map.of(
-                                                "error", ex.getMessage()));
+                                                ERROR_KEY, ex.getMessage()));
         }
 
         @ExceptionHandler(UnauthorizedException.class)
@@ -66,7 +67,7 @@ public class GlobalExceptionHandler {
                 return ResponseEntity
                                 .status(HttpStatus.UNAUTHORIZED)
                                 .body(Map.of(
-                                                "error", ex.getMessage()));
+                                                ERROR_KEY, ex.getMessage()));
         }
 
         @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -75,7 +76,7 @@ public class GlobalExceptionHandler {
                 return ResponseEntity
                                 .status(HttpStatus.BAD_REQUEST)
                                 .body(Map.of(
-                                                "error", "Invalid JSON format",
+                                                ERROR_KEY, "Invalid JSON format",
                                                 "details", ex.getMostSpecificCause() != null
                                                                 ? ex.getMostSpecificCause().getMessage()
                                                                 : ex.getMessage()));
@@ -87,7 +88,7 @@ public class GlobalExceptionHandler {
                 return ResponseEntity
                                 .status(HttpStatus.NOT_FOUND)
                                 .body(Map.of(
-                                                "error", ex.getMessage()));
+                                                ERROR_KEY, ex.getMessage()));
         }
 
         @ExceptionHandler(ConflictException.class)
@@ -95,7 +96,7 @@ public class GlobalExceptionHandler {
                 return ResponseEntity
                                 .status(HttpStatus.CONFLICT)
                                 .body(Map.of(
-                                                "error", ex.getMessage()));
+                                                ERROR_KEY, ex.getMessage()));
         }
 
         @ExceptionHandler(ForbiddenException.class)
@@ -103,7 +104,7 @@ public class GlobalExceptionHandler {
                 return ResponseEntity
                                 .status(HttpStatus.FORBIDDEN)
                                 .body(Map.of(
-                                                "error", ex.getMessage()));
+                                                ERROR_KEY, ex.getMessage()));
         }
 
         @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -111,7 +112,7 @@ public class GlobalExceptionHandler {
                 return ResponseEntity
                                 .status(HttpStatus.METHOD_NOT_ALLOWED)
                                 .body(Map.of(
-                                                "error", ex.getMessage()));
+                                                ERROR_KEY, ex.getMessage()));
         }
 
         @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
@@ -119,7 +120,7 @@ public class GlobalExceptionHandler {
                 return ResponseEntity
                                 .status(HttpStatus.BAD_REQUEST)
                                 .body(Map.of(
-                                                "error", ex.getMessage()));
+                                                ERROR_KEY, ex.getMessage()));
         }
 
         @ExceptionHandler(MaxUploadSizeExceededException.class)
@@ -129,7 +130,7 @@ public class GlobalExceptionHandler {
                 return ResponseEntity
                                 .status(HttpStatus.BAD_REQUEST)
                                 .body(Map.of(
-                                                "error", "Maximum file size is 2 MB."));
+                                                ERROR_KEY, "Maximum file size is 2 MB."));
         }
 
         @ExceptionHandler(AuthorizationDeniedException.class)
@@ -137,7 +138,7 @@ public class GlobalExceptionHandler {
                 return ResponseEntity
                                 .status(HttpStatus.FORBIDDEN)
                                 .body(Map.of(
-                                                "error", ex.getMessage()));
+                                                ERROR_KEY, ex.getMessage()));
         }
 
         @ExceptionHandler(OptimisticLockingFailureException.class)
@@ -145,7 +146,7 @@ public class GlobalExceptionHandler {
                 return ResponseEntity
                                 .status(HttpStatus.CONFLICT)
                                 .body(Map.of(
-                                                "error",
+                                                ERROR_KEY,
                                                 "The resource was modified by another user. Please refresh and try again."));
         }
 
@@ -157,7 +158,7 @@ public class GlobalExceptionHandler {
                                                 ? ex.status()
                                                 : HttpStatus.BAD_GATEWAY.value())
                                 .body(Map.of(
-                                                "error", ex.getMessage()));
+                                                ERROR_KEY, ex.getMessage()));
         }
 
         @ExceptionHandler(MissingServletRequestPartException.class)
@@ -167,7 +168,7 @@ public class GlobalExceptionHandler {
                 return ResponseEntity
                                 .status(HttpStatus.BAD_REQUEST)
                                 .body(Map.of(
-                                                "error", ex.getRequestPartName() + " is required."));
+                                                ERROR_KEY, ex.getRequestPartName() + " is required."));
         }
 
         // Catch All
@@ -179,7 +180,7 @@ public class GlobalExceptionHandler {
                 return ResponseEntity
                                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                                 .body(Map.of(
-                                                "error", "Internal Server Error"));
+                                                ERROR_KEY, "Internal Server Error"));
         }
 
 }
