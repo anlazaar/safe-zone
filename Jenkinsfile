@@ -225,8 +225,7 @@ pipeline {
 
                     withSonarQubeEnv('SonarQube') {
                         sh """
-                            ${scannerHome}/bin/sonar-scanner \
-                                -Dsonar.host.url=http://localhost:9000
+                            ${scannerHome}/bin/sonar-scanner
                         """
                     }
                 }
