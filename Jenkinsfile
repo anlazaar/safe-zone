@@ -238,7 +238,6 @@ pipeline {
                 timeout(time: 10, unit: 'MINUTES') {
                     waitForQualityGate(
                         abortPipeline: true,
-                        credentialsId: 'SONAR_TOKEN'
                     )
                 }
             }
