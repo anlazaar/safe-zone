@@ -4,4 +4,9 @@
 **/*.p12
 docs/
 generateCerts.sh
-frontend/coverage/*
+
+# Test coverage
+frontend/coverage/
+
+# Jenkins
+deps-setup/jenkins-setup/agent.jar
