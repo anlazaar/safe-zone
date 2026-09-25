@@ -119,7 +119,7 @@ pipeline {
 
                                 tests[currentService] = {
                                     dir("backend/${currentService}") {
-                                        sh './mvnw clean verify'
+                                        sh './mvnw verify'
                                     }
                                 }
                             }
@@ -135,11 +135,11 @@ pipeline {
                     }
                 }
 
-                stage('Stash Coverage') {
+                stage('Stash Backend Artifacts') {
                     steps {
                         stash(
-                            name: 'backend-coverage',
-                            includes: 'backend/**/target/site/jacoco/jacoco.xml',
+                            name: 'backend-artifacts',
+                            includes: 'backend/**/target/classes/**/*.class,backend/**/target/site/jacoco/jacoco.xml',
                             allowEmpty: true
                         )
                     }
@@ -190,7 +190,7 @@ pipeline {
                     }
                 }
 
-                stage('Stash Coverage') {
+                stage('Stash Frontend Coverage') {
                     steps {
                         stash(
                             name: 'frontend-coverage',
@@ -210,27 +210,15 @@ pipeline {
             steps {
                 deleteDir()
 
-                checkout scm
+                unstash 'source'
+                unstash 'backend-artifacts'
 
                 script {
-                    if (
-                        params.TEST_SCOPE == 'all' ||
-                        params.TEST_SCOPE == 'backend'
-                    ) {
-                        unstash 'backend-coverage'
-                    }
-
                     if (
                         params.TEST_SCOPE == 'all' ||
                         params.TEST_SCOPE == 'frontend'
                     ) {
                         unstash 'frontend-coverage'
-                    }
-
-                    services.each { service ->
-                        dir("backend/${service}") {
-                            sh './mvnw package -DskipTests'
-                        }
                     }
 
                     def scannerHome = tool 'SonarScanner'
@@ -246,11 +234,11 @@ pipeline {
         }
 
         stage('Quality Gate') {
-            agent none
-
             steps {
                 timeout(time: 10, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
+                    waitForQualityGate(
+                        abortPipeline: true,
+                    )
                 }
             }
         }
@@ -272,7 +260,6 @@ pipeline {
 
             steps {
                 deleteDir()
-
                 unstash 'source'
 
                 withCredentials([
@@ -373,7 +360,8 @@ pipeline {
 
                         echo 'Starting rollback...'
 
-                        def previousBuild = currentBuild.previousSuccessfulBuild
+                        def previousBuild =
+                            currentBuild.previousSuccessfulBuild
 
                         if (previousBuild == null) {
                             error(
@@ -382,7 +370,8 @@ pipeline {
                             )
                         }
 
-                        def previousVersion = "1.0.${previousBuild.number}"
+                        def previousVersion =
+                            "1.0.${previousBuild.number}"
 
                         sh """
                             export IMAGE_TAG=${previousVersion}
@@ -418,14 +407,16 @@ pipeline {
                             to: env.NOTIFICATION_EMAIL,
                             subject: "Build #${env.BUILD_NUMBER} — ${env.JOB_NAME} — SUCCESS",
                             body: """
-                                Build completed successfully.
+                                Pipeline completed successfully.
+
                                 Job: ${env.JOB_NAME}
                                 Build: #${env.BUILD_NUMBER}
                                 Version: ${env.IMAGE_TAG}
                                 Test scope: ${params.TEST_SCOPE}
                                 Status: SUCCESS
-                                The application was built, tested, and deployed successfully,
-                                for logs see ${env.BUILD_URL}.
+
+                                Logs:
+                                ${env.BUILD_URL}
                             """.stripIndent()
                         )
                     }
@@ -444,13 +435,16 @@ pipeline {
                             to: env.NOTIFICATION_EMAIL,
                             subject: "Build #${env.BUILD_NUMBER} — ${env.JOB_NAME} — FAILURE",
                             body: """
-                                Build failed.
+                                Pipeline failed.
+
                                 Job: ${env.JOB_NAME}
                                 Build: #${env.BUILD_NUMBER}
                                 Version: ${env.IMAGE_TAG}
                                 Test scope: ${params.TEST_SCOPE}
                                 Status: FAILURE
-                                Check the Jenkins console output for details.
+
+                                Check the Jenkins console output:
+                                ${env.BUILD_URL}
                             """.stripIndent()
                         )
                     }
