@@ -86,6 +86,16 @@ unclassified:
         serverUrl: "http://sonarqube:9000"
         credentialsId: "SONAR_TOKEN"
 
+tool:
+  sonarRunnerInstallation:
+    installations:
+      - name: "SonarScanner"
+        properties:
+          - installSource:
+              installers:
+                - sonarRunnerInstaller:
+                    id: "7.2.0.5079"
+
 credentials:
   system:
     domainCredentials:
