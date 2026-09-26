@@ -243,7 +243,7 @@ services:
   #     ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_ROOT_PASSWORD}
 
   minio:
-    image: minio/minio
+    build: ./deps-setup/minio
 
     # ports:
     #   - "9001:9001"
@@ -251,8 +251,6 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-
-    command: server /data --console-address ":9001"
 
     volumes:
       - minio-data:/data
