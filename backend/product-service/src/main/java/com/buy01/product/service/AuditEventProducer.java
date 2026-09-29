@@ -14,6 +14,7 @@ public class AuditEventProducer {
     private static final String TOPIC = "audit-events";
 
     private final KafkaTemplate<String, AuditEvent> kafkaTemplate;
+    ;
 
     public void send(AuditEvent event) {
         log.info("Sending audit event to Kafka topic {}: {}", TOPIC, event);
