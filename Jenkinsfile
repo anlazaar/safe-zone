@@ -437,7 +437,7 @@ pipeline {
                             body: """
                                 Pipeline failed.
 
-                                Job: ${env.JOB_NAME}
+                                Job: ${env.JOB_NAME}  
                                 Build: #${env.BUILD_NUMBER}
                                 Version: ${env.IMAGE_TAG}
                                 Test scope: ${params.TEST_SCOPE}
