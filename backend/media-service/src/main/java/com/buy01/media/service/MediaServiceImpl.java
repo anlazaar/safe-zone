@@ -50,7 +50,7 @@ public class MediaServiceImpl implements MediaService {
         private final S3Client s3Client;
         private final Tika tika = new Tika();
 
-        private static final long MAX_FILE_SIZE = 2L * 1024 * 1024;
+        private static final long MAX_FILE_SIZE = 2 * 1024 * 1024;
 
         @Value("${minio.bucket}")
         private String bucket;
